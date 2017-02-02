@@ -7,8 +7,10 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -42,5 +44,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         LatLng van = new LatLng(49.209916, -122.979584);
         mMap.addMarker(new MarkerOptions().position(van).title("You are Here"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(van));
+
+        new MarkerList(getBaseContext(), mMap, R.raw.trees, "Tree", BitmapDescriptorFactory.fromResource(R.mipmap.tree));
+
     }
 }
