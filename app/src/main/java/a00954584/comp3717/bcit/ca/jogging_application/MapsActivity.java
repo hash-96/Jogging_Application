@@ -52,14 +52,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.addMarker(new MarkerOptions().position(van).title("You are Here"));
 
         //setMinMaxZooms for Camera - Terra
-        mMap.setMinZoomPreference(17.0f);
+        mMap.setMinZoomPreference(14.0f);
         mMap.setMaxZoomPreference(19.0f);
 
         mMap.moveCamera(CameraUpdateFactory
-                .newLatLngZoom(van, 17.0f));
+                .newLatLngZoom(van, 14.0f));
 
         //Populate Tree markers - Terra
         new MarkerList(getBaseContext(), mMap, R.raw.trees, "Tree", R.drawable.tree);
+        new MarkerList(getBaseContext(), mMap, R.raw.washrooms, "Washroom", R.drawable.washroom);
+
 
     }
+
 }
