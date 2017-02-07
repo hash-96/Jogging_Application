@@ -22,7 +22,7 @@ public class MarkerList {
     ArrayList<MarkerOptions> arrList = new ArrayList<MarkerOptions>();
     GoogleMap gMap;
 
-    MarkerList(Context context, GoogleMap gMap, int res, String markerName, BitmapDescriptor icon) {
+    MarkerList(Context context, GoogleMap gMap, int textRes, String markerName, int icon) {
         this.gMap = gMap;
 
         System.out.println("Running Yo");
@@ -33,7 +33,7 @@ public class MarkerList {
 
             System.out.println("opened Yo");
             reader = new BufferedReader(
-                        new InputStreamReader(context.getResources().openRawResource(res)));
+                        new InputStreamReader(context.getResources().openRawResource(textRes)));
 
             System.out.println("Dataset Open Yo");
 
@@ -47,7 +47,7 @@ public class MarkerList {
                         .position(new LatLng(
                                 Double.parseDouble(s[0]), Double.parseDouble(s[1])))
                         .title("Tree")
-                        .icon(BitmapDescriptorFactory.fromResource(R.mipmap.tree)));
+                        .icon(BitmapDescriptorFactory.fromResource(icon)));
             }
         } catch (Exception e) {
             System.out.println("Error Loading File");

@@ -3,7 +3,6 @@ package a00954584.comp3717.bcit.ca.jogging_application;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 
-import com.androidmapsextensions.ClusteringSettings;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -60,7 +59,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .newLatLngZoom(van, 17.0f));
 
         //Populate Tree markers - Terra
-        new MarkerList(getBaseContext(), mMap, R.raw.trees, "Tree", BitmapDescriptorFactory.fromResource(R.mipmap.tree));
+        new MarkerList(getBaseContext(), mMap, R.raw.trees, "Tree", R.drawable.tree);
 
     }
 }
