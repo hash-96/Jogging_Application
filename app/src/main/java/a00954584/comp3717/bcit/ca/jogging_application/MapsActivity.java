@@ -7,7 +7,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -26,6 +25,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
         mapFragment.getMapAsync(this);
+
+
+
     }
 
 
@@ -40,8 +42,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
 
+        DatabaseMgr.init(this);
+        mMap = googleMap;
+        System.out.println("heyy");
         // Add a marker in Burnaby and move the camera
         LatLng van = new LatLng(49.1780501,-122.9526167);
 
@@ -54,15 +58,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         //setMinMaxZooms for Camera - Terra
         mMap.setMinZoomPreference(14.0f);
         mMap.setMaxZoomPreference(19.0f);
-
         mMap.moveCamera(CameraUpdateFactory
                 .newLatLngZoom(van, 14.0f));
-
-        //Populate Tree markers - Terra
-        new MarkerList(getBaseContext(), mMap, R.raw.trees, "Tree", R.drawable.tree);
-        new MarkerList(getBaseContext(), mMap, R.raw.washrooms, "Washroom", R.drawable.washroom);
-
-
+        System.out.println("heyy");
+        DatabaseMgr.fillDatabase(
+                getResources().openRawResource(R.raw.trees),
+                getResources().openRawResource(R.raw.benches),
+                getResources().openRawResource(R.raw.washrooms),
+                getResources().openRawResource(R.raw.fountains));
+        System.out.println("heyy");
+        new genMarkers(mMap, "Tree", R.drawable.tree, DatabaseMgr.getCoordsTree());
+        new genMarkers(mMap, "Bench", R.drawable.bench, DatabaseMgr.getCoordsBench());
+        new genMarkers(mMap, "Washroom", R.drawable.washroom, DatabaseMgr.getCoordsWashroom());
+        new genMarkers(mMap, "Fountain", R.drawable.fountain, DatabaseMgr.getCoordsFountain());
+        System.out.println("heyy");
     }
 
 }
