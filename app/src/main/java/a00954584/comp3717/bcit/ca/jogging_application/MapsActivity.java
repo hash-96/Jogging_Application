@@ -1,35 +1,114 @@
 package a00954584.comp3717.bcit.ca.jogging_application;
 
+import android.*;
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
-
 import static a00954584.comp3717.bcit.ca.jogging_application.R.id.map;
 
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+public class MapsActivity extends FragmentActivity
+        implements OnMapReadyCallback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener {
+
+
+
+    private static final String[] LOCATION_PERMS = {
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
+            android.Manifest.permission.ACCESS_COARSE_LOCATION
+    };
+    private static final int LOCATION_REQUEST = 1340;
 
     private GoogleMap mMap;
+    private GoogleApiClient mGoogleApiClient;
+    private LocationManager locationManager;
+    private Location location;
+    Fragment parentFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
+        mapFragment.setHasOptionsMenu(true);
         mapFragment.getMapAsync(this);
-
-
-
+        parentFragment = mapFragment.getParentFragment();
+        setupApi();
     }
 
+    private void setupApi() {
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+  //  private void initListeners() {
+        //   mMap.setOnMapLongClickListener(this);
+       // mMap.setOnInfoWindowClickListener(this);
+       // mMap.setOnMapClickListener(this);
+ //   }
+
+    private void setUpMap() {
+        //setMinMaxZooms for Camera - Terra
+        mMap.setMinZoomPreference(11.0f);
+        mMap.setMaxZoomPreference(19.0f);
+        new genMarkers(mMap, "Tree", R.drawable.tree, DatabaseMgr.getCoordsTree());
+        new genMarkers(mMap, "Bench", R.drawable.bench, DatabaseMgr.getCoordsBench());
+        new genMarkers(mMap, "Washroom", R.drawable.washroom, DatabaseMgr.getCoordsWashroom());
+        new genMarkers(mMap, "Fountain", R.drawable.fountain, DatabaseMgr.getCoordsFountain());
+    }
+
+
+    private void initCamera(Location location) {
+        CameraPosition position = CameraPosition.builder()
+                .target(new LatLng(location.getLatitude(),
+                        location.getLongitude()))
+                .zoom(16f)
+                .bearing(0.0f)
+                .tilt(0.0f)
+                .build();
+
+        mMap.animateCamera(CameraUpdateFactory
+                .newCameraPosition(position), null);
+        mMap.getUiSettings().setZoomControlsEnabled(true);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        //1340 = location permission
+        if (requestCode == LOCATION_REQUEST) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+            mMap.setMyLocationEnabled(true);
+        }
+    }
 
     /**
      * Manipulates the map once available.
@@ -43,35 +122,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
 
-        DatabaseMgr.init(this);
         mMap = googleMap;
-        System.out.println("heyy");
-        // Add a marker in Burnaby and move the camera
-        LatLng van = new LatLng(49.1780501,-122.9526167);
-
-
-       // mMap.setClustering(new ClusteringSettings().enabled(true)
-         //       .addMarkersDynamically(true).minMarkersCount(5));
-
-        mMap.addMarker(new MarkerOptions().position(van).title("You are Here"));
-
-        //setMinMaxZooms for Camera - Terra
-        mMap.setMinZoomPreference(14.0f);
-        mMap.setMaxZoomPreference(19.0f);
-        mMap.moveCamera(CameraUpdateFactory
-                .newLatLngZoom(van, 14.0f));
-        System.out.println("heyy");
+        DatabaseMgr.init(this);
         DatabaseMgr.fillDatabase(
                 getResources().openRawResource(R.raw.trees),
                 getResources().openRawResource(R.raw.benches),
                 getResources().openRawResource(R.raw.washrooms),
                 getResources().openRawResource(R.raw.fountains));
-        System.out.println("heyy");
-        new genMarkers(mMap, "Tree", R.drawable.tree, DatabaseMgr.getCoordsTree());
-        new genMarkers(mMap, "Bench", R.drawable.bench, DatabaseMgr.getCoordsBench());
-        new genMarkers(mMap, "Washroom", R.drawable.washroom, DatabaseMgr.getCoordsWashroom());
-        new genMarkers(mMap, "Fountain", R.drawable.fountain, DatabaseMgr.getCoordsFountain());
-        System.out.println("heyy");
+        setUpMap();
     }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+            mGoogleApiClient.disconnect();
+        }
+    }
+
+    public void onConnected(@Nullable Bundle bundle) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(LOCATION_PERMS, LOCATION_REQUEST);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return;
+        }
+
+        mMap.setMyLocationEnabled(true);
+        location = LocationServices
+                .FusedLocationApi
+                .getLastLocation(mGoogleApiClient);
+        initCamera(location);
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
+
+    }
+
 
 }

@@ -10,11 +10,15 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true  // this line will solve this problem
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            debug {
+                debuggable true
+            }
         }
     }
 }
@@ -29,4 +33,5 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.androidmapsextensions:android-maps-extensions:2.3.1'
     compile 'org.greenrobot:greendao:3.2.0'
+    compile 'com.google.android.gms:play-services-location:7.8.0'
 }
