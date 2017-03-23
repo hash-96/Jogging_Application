@@ -1,19 +1,16 @@
 package a00954584.comp3717.bcit.ca.jogging_application;
 
-import android.*;
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.os.Bundle;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -24,6 +21,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+
 import static a00954584.comp3717.bcit.ca.jogging_application.R.id.map;
 
 
@@ -31,8 +29,6 @@ public class MapsActivity extends FragmentActivity
         implements OnMapReadyCallback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
-
-
 
     private static final String[] LOCATION_PERMS = {
             android.Manifest.permission.ACCESS_FINE_LOCATION,
@@ -46,11 +42,14 @@ public class MapsActivity extends FragmentActivity
     private Location location;
     Fragment parentFragment;
 
+    private DatabaseMgr DBmgr;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        DBmgr = new DatabaseMgr(this);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(map);
@@ -78,10 +77,10 @@ public class MapsActivity extends FragmentActivity
         //setMinMaxZooms for Camera - Terra
         mMap.setMinZoomPreference(11.0f);
         mMap.setMaxZoomPreference(19.0f);
-        new genMarkers(mMap, "Tree", R.drawable.tree, DatabaseMgr.getCoordsTree());
-        new genMarkers(mMap, "Bench", R.drawable.bench, DatabaseMgr.getCoordsBench());
-        new genMarkers(mMap, "Washroom", R.drawable.washroom, DatabaseMgr.getCoordsWashroom());
-        new genMarkers(mMap, "Fountain", R.drawable.fountain, DatabaseMgr.getCoordsFountain());
+        new genMarkers(mMap, "Tree", R.drawable.tree, DBmgr.getCoordsTree());
+        new genMarkers(mMap, "Bench", R.drawable.bench, DBmgr.getCoordsBench());
+        new genMarkers(mMap, "Washroom", R.drawable.washroom, DBmgr.getCoordsWashroom());
+        new genMarkers(mMap, "Fountain", R.drawable.fountain, DBmgr.getCoordsFountain());
     }
 
 
@@ -103,7 +102,10 @@ public class MapsActivity extends FragmentActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         //1340 = location permission
         if (requestCode == LOCATION_REQUEST) {
-            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED
+                    && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION)
+                    != PackageManager.PERMISSION_GRANTED) {
                 return;
             }
             mMap.setMyLocationEnabled(true);
@@ -123,9 +125,7 @@ public class MapsActivity extends FragmentActivity
     public void onMapReady(GoogleMap googleMap) {
 
         mMap = googleMap;
-        DatabaseMgr.init(this);
-        DatabaseMgr.fillDatabase(
-                getResources().openRawResource(R.raw.trees),
+        DBmgr.init(getResources().openRawResource(R.raw.trees),
                 getResources().openRawResource(R.raw.benches),
                 getResources().openRawResource(R.raw.washrooms),
                 getResources().openRawResource(R.raw.fountains));
@@ -151,7 +151,9 @@ public class MapsActivity extends FragmentActivity
             requestPermissions(LOCATION_PERMS, LOCATION_REQUEST);
         }
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
             return;
         }
 
