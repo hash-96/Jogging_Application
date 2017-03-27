@@ -2,9 +2,7 @@ package com.example;
 
 import org.greenrobot.greendao.generator.DaoGenerator;
 import org.greenrobot.greendao.generator.Entity;
-import org.greenrobot.greendao.generator.Property;
 import org.greenrobot.greendao.generator.Schema;
-import org.greenrobot.greendao.generator.ToMany;
 
 public class GreenDao {
     public static void main(String[] args) throws Exception{
@@ -38,13 +36,6 @@ public class GreenDao {
         bench.addDoubleProperty("longitude");
         bathroom.addDoubleProperty("longitude");
         fountain.addDoubleProperty("longitude");
-
-
-        dataset.addToOne(catagory, catagoryID);
-
-        ToMany catagoryToDataset = catagory.addToMany(dataset, catagoryID);
-        catagoryToDataset.setName("Datasets");
-
 
         generator = new DaoGenerator();
         generator.generateAll(schema, "./app/src/main/java");
