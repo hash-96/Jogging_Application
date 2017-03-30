@@ -5,6 +5,7 @@
       <module fileurl="file://$PROJECT_DIR$/Jogging_Application.iml" filepath="$PROJECT_DIR$/Jogging_Application.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
       <module fileurl="file://$PROJECT_DIR$/greendao_generator/greendao_generator.iml" filepath="$PROJECT_DIR$/greendao_generator/greendao_generator.iml" />
+      <module fileurl="file://$PROJECT_DIR$/greendao_generator/greendao_generator.iml" filepath="$PROJECT_DIR$/greendao_generator/greendao_generator.iml" />
     </modules>
   </component>
 </project>
