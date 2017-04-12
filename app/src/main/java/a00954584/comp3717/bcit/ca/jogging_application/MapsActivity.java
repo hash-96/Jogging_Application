@@ -92,7 +92,6 @@ public class MapsActivity extends FragmentActivity
         //setMinMaxZooms for Camera - Terra
         mMap.setMinZoomPreference(11.0f);
         mMap.setMaxZoomPreference(19.0f);
-        new genMarkers(mMap, "Tree", R.drawable.tree, DBmgr.getCoordsTree());
         new genMarkers(mMap, "Bench", R.drawable.bench, DBmgr.getCoordsBench());
         new genMarkers(mMap, "Washroom", R.drawable.washroom, DBmgr.getCoordsWashroom());
         new genMarkers(mMap, "Fountain", R.drawable.fountain, DBmgr.getCoordsFountain());
