@@ -25,6 +25,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -92,10 +93,10 @@ public class MapsActivity extends FragmentActivity
         //setMinMaxZooms for Camera - Terra
         mMap.setMinZoomPreference(11.0f);
         mMap.setMaxZoomPreference(19.0f);
-        new genMarkers(mMap, "Tree", R.drawable.tree, DBmgr.getCoordsTree());
-        new genMarkers(mMap, "Bench", R.drawable.bench, DBmgr.getCoordsBench());
-        new genMarkers(mMap, "Washroom", R.drawable.washroom, DBmgr.getCoordsWashroom());
-        new genMarkers(mMap, "Fountain", R.drawable.fountain, DBmgr.getCoordsFountain());
+       // new genMarkers(mMap, "Tree", R.drawable.tree, DBmgr.getCoordsTree());
+        new genMarkers(mMap, "Bench", R.drawable.bench2, DBmgr.getCoordsBench());
+        new genMarkers(mMap, "Washroom", R.drawable.washroom2, DBmgr.getCoordsWashroom());
+        new genMarkers(mMap, "Fountain", R.drawable.fountain2, DBmgr.getCoordsFountain());
     }
 
 
@@ -163,6 +164,28 @@ public class MapsActivity extends FragmentActivity
                 // Start downloading json data from Google Directions API
                 downloadTask.execute(url);
             }
+        });
+        mMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener()
+        {
+
+            @Override
+            public boolean onMarkerClick(Marker arg0) {
+                if (path != null) {
+                    path.remove();
+                }
+                LatLng origin = new LatLng(location.getLatitude(), location.getLongitude());
+                LatLng dest = arg0.getPosition();
+                // Getting URL to the Google Directions API
+                String url = getDirectionsUrl(origin, dest);
+                Log.d("url", url);
+
+                DownloadTask downloadTask = new DownloadTask();
+
+                // Start downloading json data from Google Directions API
+                downloadTask.execute(url);
+                return true;
+            }
+
         });
 
     }
